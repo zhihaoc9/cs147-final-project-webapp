@@ -57,7 +57,7 @@ void sendToServer(float latitude, float longitude) {
   WiFiClient c;
   HttpClient http(c);
   char query[64];
-  snprintf(query, sizeof(query), "/?latitude=%.2f&longitude=%.2f", latitude, longitude);
+  snprintf(query, sizeof(query), "/?latitude=%.2f&longitude=%.2f&action='None'", latitude, longitude);
   
   err = http.get(kHostname, atoi(kPath), query, NULL);
   if (err == 0) {
