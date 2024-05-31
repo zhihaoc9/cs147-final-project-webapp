@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 
 function App() {
   const handleClick = (action) => {
-    fetch(`http://ec2-107-22-40-2.compute-1.amazonaws.com:5000/?action=${action}&latitude=${"None"}&longitude=${"None"}`)
-      .then(response => response.text())
+    fetch(`http://ec2-107-22-40-2.compute-1.amazonaws.com:5000/?action=${action}&latitude=None&longitude=None`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.text();
+      })
       .then(data => alert(data))
       .catch(error => console.error('Error:', error));
   };
