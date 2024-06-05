@@ -41,7 +41,7 @@ function App() {
     fetch(`http://ec2-107-22-40-2.compute-1.amazonaws.com:5000/action?sound=${sound}&light=${light}`)
       .then(response => {
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error('No response');
         }
         return response.text();
       })
