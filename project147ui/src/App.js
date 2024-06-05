@@ -57,32 +57,23 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>Item Finder</h1>
-        <div className="controls">
+
+        <div className="switch">
           <div>
             <label>
               Sound
-              <Switch
-                onChange={handleSoundChange}
-                checked={sound}
-                uncheckedIcon={false}
-                checkedIcon={false}
-              />
+              <Switch onChange={handleSoundChange} checked={sound} uncheckedIcon={false} checkedIcon={false} />
             </label>
           </div>
           <div>
             <label>
               Light
-              <Switch
-                onChange={handleLightChange}
-                checked={light}
-                uncheckedIcon={false}
-                checkedIcon={false}
-              />
+              <Switch onChange={handleLightChange} checked={light} uncheckedIcon={false} checkedIcon={false}/>
             </label>
           </div>
         </div>
-        <p>Latitude: {latitude}</p>
-        <p>Longitude: {longitude}</p>
+
+        <p>Latitude: {latitude}</p><p>Longitude: {longitude}</p>
         
         <div className="map-container">
           <MapContainer center={[latitude, longitude]} zoom={13} style={{ height: '100%', width: '100%' }}>
