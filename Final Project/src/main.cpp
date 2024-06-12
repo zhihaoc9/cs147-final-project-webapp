@@ -17,10 +17,13 @@ TinyGPSPlus gps;
 // Define the hardware serial port
 HardwareSerial gpsSerial(1);
 
+char sound;
+char light;
+int bodyLen;
 
 char ssid[50] = "jenny (2)"; // network SSID (name)
-char pass[50] = "jenny22475"; // network password
-const char kHostname[] = "107.22.40.2";
+char pass[50] = "jenny123"; // network password
+const char kHostname[] = "18.212.215.254";
 // Path to download (this is the bit after the hostname in the URL
 // that you want to download
 const char kPath[] = "5000";
@@ -29,13 +32,15 @@ const int kNetworkTimeout = 30 * 1000;
 // Number of milliseconds to wait if no data is available before trying again
 const int kNetworkDelay = 1000;
 
+
 void setup()
 {
     Serial.begin(9600);             // Initialize the serial monitor
     gpsSerial.begin(9600, SERIAL_8N1, 26, 27); // GPS module baud rate, TX/RX pins
-    /*Serial.println("GPS Module Connected!");
+    Serial.println("GPS Module Connected!");
     Serial.print("Connecting to ");
     Serial.println(ssid);
+    WiFi.disconnect(true);
     WiFi.begin(ssid, pass);
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
@@ -46,7 +51,7 @@ void setup()
     Serial.println("IP address: ");
     Serial.println(WiFi.localIP());
     Serial.println("MAC address: ");
-    Serial.println(WiFi.macAddress());*/
+    Serial.println(WiFi.macAddress());
     pinMode(LED_PIN, OUTPUT);
     pinMode(BUZZER_PIN, OUTPUT);
 } 
@@ -57,8 +62,8 @@ void sendToServer(float latitude, float longitude) {
   WiFiClient c;
   HttpClient http(c);
   char query[64];
-  snprintf(query, sizeof(query), "/?latitude=%.2f&longitude=%.2f&action='None'", latitude, longitude);
-  
+  snprintf(query, sizeof(query), "/?latitude=%.2f&longitude=%.2f", latitude, longitude);
+
   err = http.get(kHostname, atoi(kPath), query, NULL);
   if (err == 0) {
     Serial.println("startedRequest ok");
@@ -68,20 +73,32 @@ void sendToServer(float latitude, float longitude) {
       Serial.println(err);
       err = http.skipResponseHeaders();
       if (err >= 0) {
-        int bodyLen = http.contentLength();
+        bodyLen = http.contentLength();
+        int test = http.contentLength();
         Serial.print("Content length is: ");
         Serial.println(bodyLen);
         Serial.println();
         Serial.println("Body returned follows:");
-        unsigned long timeoutStart = millis();
         char c;
+        int place;
+        unsigned long timeoutStart = millis();
+        sound = 'n';
+        light = 'n';
         while ((http.connected() || http.available()) &&
                ((millis() - timeoutStart) < kNetworkTimeout)) {
           if (http.available()) {
-            c = http.read();
-            Serial.print(c);
-            bodyLen--;
-            timeoutStart = millis();
+          c = http.read();
+          Serial.print(c);
+          if(test ==  5 && c == 'n')
+          {
+            sound = 's';
+          }
+          else if(test == 1 && c == 'n')
+          {
+            light = 'l';
+          }
+          timeoutStart = millis();
+          test--;
           } else {
             delay(kNetworkDelay);
           }
@@ -98,6 +115,7 @@ void sendToServer(float latitude, float longitude) {
     Serial.print("Connect failed: ");
     Serial.println(err);
   }
+
   http.stop();
 }
 
@@ -118,19 +136,24 @@ void loop()
         Serial.println(gps.location.lng(), 6);
         float latitude = gps.location.lat();
         float longitude = gps.location.lng();
-        //sendToServer(latitude, longitude);
+        sendToServer(latitude, longitude);
     }
 
-    // if ('react app signal LED')
-        digitalWrite(LED_PIN, HIGH);
-        delay(250);
-        digitalWrite(LED_PIN, LOW);
+  // Send sound and light signals to development board 
+  if(sound == 's' || bodyLen == 5 )
+  {
+    tone(BUZZER_PIN, 261, 500);
+    tone(BUZZER_PIN, 294, 500);
+    tone(BUZZER_PIN, 330, 500);
+    delay(500);
+    noTone(BUZZER_PIN);
+  }
 
-    // if ('react app signal SOUND')
-        tone(BUZZER_PIN, 261, 500);
-        tone(BUZZER_PIN, 294, 500);
-        tone(BUZZER_PIN, 330, 500);
-        delay(500);
-        noTone(BUZZER_PIN);
+  if(light == 'l' || bodyLen == 5)
+  {
+    digitalWrite(LED_PIN, HIGH);
+    delay(500);
+    digitalWrite(LED_PIN, LOW);
+  }
 
 }

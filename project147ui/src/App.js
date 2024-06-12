@@ -38,7 +38,7 @@ function App() {
   };
 
   const handleClick = (sound, light) => {
-    fetch(`http://ec2-107-22-40-2.compute-1.amazonaws.com:5000/action?sound=${sound}&light=${light}`)
+    fetch(`http://ec2-18-212-215-254.compute-1.amazonaws.com:5000/action?sound=${sound}&light=${light}`)
       .then(response => {
         if (!response.ok) {
           throw new Error('No response');
